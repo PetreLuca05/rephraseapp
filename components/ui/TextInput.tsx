@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import {
-  StyleSheet,
-  Text,
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
+  StyleSheet,
+  Text,
   View,
 } from 'react-native'
 import { colors, radius, spacing, typography } from '../../constants/theme'
@@ -51,12 +51,13 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   input: {
-    height: 48,
+    paddingVertical: 12,
+    paddingHorizontal: spacing.md,
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    ...typography.body,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
     color: colors.text,
     backgroundColor: colors.background,
   },

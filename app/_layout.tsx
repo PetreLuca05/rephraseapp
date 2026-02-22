@@ -10,22 +10,17 @@ export default function RootLayout() {
   const segments = useSegments()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
-
     return () => subscription.unsubscribe()
   }, [])
 
   useEffect(() => {
     if (session === undefined) return
+    if (!segments.length) return
 
     const inDrawer = segments[0] === '(drawer)'
-
     if (session && !inDrawer) {
       router.replace('/(drawer)/(tabs)/chats')
     } else if (!session && inDrawer) {
@@ -36,6 +31,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
       </Stack>
