@@ -5,9 +5,9 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="chats"
+        name="chat"
         options={{
-          title: 'Chats',
+          title: 'Chat',
           headerLeft: () => <DrawerToggleButton />,
         }}
       />

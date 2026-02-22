@@ -22,7 +22,7 @@ export default function RootLayout() {
 
     const inDrawer = segments[0] === '(drawer)'
     if (session && !inDrawer) {
-      router.replace('/(drawer)/(tabs)/chats')
+      router.replace('/(drawer)/(tabs)/chat')
     } else if (!session && inDrawer) {
       router.replace('/login')
     }

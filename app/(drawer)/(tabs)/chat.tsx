@@ -6,12 +6,6 @@ import { colors, spacing } from '../../../constants/theme'
 
 type ChatParams = { id: string; title: string; preview: string; time: string }
 
-interface ChatMessage {
-  id: string
-  text: string
-  sender: 'user' | 'ai'
-}
-
 interface HeaderRendererProps {
   title: string
   preview: string

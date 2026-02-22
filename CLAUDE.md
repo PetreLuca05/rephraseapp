@@ -30,12 +30,12 @@ EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 
 ```
 app/_layout.tsx          ← Root Stack (GestureHandlerRootView)
-├── index.tsx            ← Redirect-only: routes to /login or /(drawer)/(tabs)/chats
+├── index.tsx            ← Redirect-only: routes to /login or /(drawer)/(tabs)/chat
 ├── login.tsx            ← Unauthenticated entry point
 └── (drawer)/_layout.tsx ← Drawer navigator (DrawerContent component)
     ├── account.tsx      ← Account/profile settings screen
     └── (tabs)/_layout.tsx ← Tab navigator
-        ├── chats.tsx
+        ├── chat.tsx
         └── debug.tsx
 ```
 
