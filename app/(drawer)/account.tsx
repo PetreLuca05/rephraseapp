@@ -1,13 +1,23 @@
 import { Session } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
-import { Alert, Button, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native'
+import { Button } from '../../components/ui/Button'
+import { ScrollView } from '../../components/ui/ScrollView'
+import { TextInput } from '../../components/ui/TextInput'
+import { colors, spacing } from '../../constants/theme'
 import { supabase } from '../../lib/supabase'
 
-export default function Account({ session }: { session: Session }) {
-  const [loading, setLoading] = useState(true)
+export default function Account() {
+  const [session, setSession] = useState<Session | null>(null)
+  const [fetching, setFetching] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
+  }, [])
 
   useEffect(() => {
     if (session) getProfile()
@@ -15,7 +25,6 @@ export default function Account({ session }: { session: Session }) {
 
   async function getProfile() {
     try {
-      setLoading(true)
       if (!session?.user) throw new Error('No user on the session!')
 
       const { data, error, status } = await supabase
@@ -23,9 +32,7 @@ export default function Account({ session }: { session: Session }) {
         .select(`username, website, avatar_url`)
         .eq('id', session?.user.id)
         .single()
-      if (error && status !== 406) {
-        throw error
-      }
+      if (error && status !== 406) throw error
 
       if (data) {
         setUsername(data.username)
@@ -33,87 +40,102 @@ export default function Account({ session }: { session: Session }) {
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
-      setLoading(false)
+      setFetching(false)
     }
   }
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }: {
-    username: string
-    website: string
-    avatar_url: string
-  }) {
+  async function updateProfile() {
     try {
       setLoading(true)
       if (!session?.user) throw new Error('No user on the session!')
 
-      const updates = {
-        id: session?.user.id,
+      const { error } = await supabase.from('profiles').upsert({
+        id: session.user.id,
         username,
         website,
-        avatar_url,
+        avatar_url: avatarUrl,
         updated_at: new Date(),
-      }
+      })
 
-      const { error } = await supabase.from('profiles').upsert(updates)
-
-      if (error) {
-        throw error
-      }
+      if (error) throw error
+      Alert.alert('Success', 'Profile updated successfully.')
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert('Error', error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TextInput placeholder="Email" value={session?.user?.email} /*disable*/ />
+  if (fetching) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput placeholder="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput placeholder="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
-      </View>
+    )
+  }
 
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
-          disabled={loading}
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.form}>
+        <TextInput
+          label="Email"
+          placeholder={session?.user?.email || 'ewew'}
+          editable={false}
+        />
+        <TextInput
+          label="Username"
+          placeholder="Your username"
+          value={username || ''}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          label="Website"
+          placeholder="https://yourwebsite.com"
+          value={website || ''}
+          onChangeText={setWebsite}
+          autoCapitalize="none"
+          keyboardType="url"
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+      <View style={styles.actions}>
+        <Button
+          title="Update Profile"
+          onPress={updateProfile}
+          loading={loading}
+        />
+        <Button
+          title="Sign Out"
+          onPress={() => supabase.auth.signOut()}
+          variant="destructive"
+        />
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    flex: 1,
+    padding: spacing.lg,
+    paddingTop: spacing.xl,
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+  title: {
+    marginBottom: spacing.xl,
   },
-  mt20: {
-    marginTop: 20,
+  form: {
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  actions: {
+    gap: spacing.sm,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
   },
 })

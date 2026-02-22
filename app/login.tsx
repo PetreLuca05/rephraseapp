@@ -1,6 +1,11 @@
-import React, { useState } from 'react'
-import { Alert, AppState, Button, StyleSheet, TextInput, View } from 'react-native'
+import { AppState, Alert, View, StyleSheet } from 'react-native'
 import { supabase } from '../lib/supabase'
+import { useState } from 'react'
+import { Button } from '../components/ui/Button'
+import { TextInput } from '../components/ui/TextInput'
+import { Text } from '../components/ui/Text'
+import { ScrollView } from '../components/ui/ScrollView'
+import { spacing } from '../constants/theme'
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -21,74 +26,68 @@ export default function Login() {
 
   async function signInWithEmail() {
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    })
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) Alert.alert(error.message)
     setLoading(false)
   }
 
   async function signUpWithEmail() {
     setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-
+    const { data: { session }, error } = await supabase.auth.signUp({ email, password })
     if (error) Alert.alert(error.message)
     if (!session) Alert.alert('Please check your inbox for email verification!')
     setLoading(false)
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text variant="heading2" style={styles.title}>Welcome back</Text>
+      <Text variant="bodySmall" style={styles.subtitle}>Sign in to your account to continue</Text>
+
+      <View style={styles.form}>
         <TextInput
-          //label="Email"
-          //leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-          onChangeText={(text) => setEmail(text)}
-          value={email}
+          label="Email"
           placeholder="email@address.com"
-          autoCapitalize={'none'}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
         />
-      </View>
-      <View style={styles.verticallySpaced}>
         <TextInput
-          //label="Password"
-          //leftIcon={{ type: 'font-awesome', name: 'lock' }}
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
+          label="Password"
           placeholder="Password"
-          autoCapitalize={'none'}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
         />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+
+      <View style={styles.actions}>
+        <Button title="Sign In" onPress={signInWithEmail} loading={loading} />
+        <Button title="Sign Up" onPress={signUpWithEmail} disabled={loading} variant="secondary" />
       </View>
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
-      </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    flex: 1,
+    padding: spacing.lg,
+    paddingTop: spacing.xxl,
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+  title: {
+    marginBottom: spacing.xs,
   },
-  mt20: {
-    marginTop: 20,
+  subtitle: {
+    marginBottom: spacing.xl,
+  },
+  form: {
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  actions: {
+    gap: spacing.sm,
   },
 })
