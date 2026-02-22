@@ -1,12 +1,59 @@
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, useNavigation } from 'expo-router'
+import { useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Text } from '../../../components/ui/Text'
 import { colors, spacing } from '../../../constants/theme'
 
 type ChatParams = { id: string; title: string; preview: string; time: string }
 
+interface ChatMessage {
+  id: string
+  text: string
+  sender: 'user' | 'ai'
+}
+
+interface HeaderRendererProps {
+  title: string
+  preview: string
+  time: string
+}
+
+function HeaderRenderer({ title, preview, time }: HeaderRendererProps) {
+  return (
+    <View style={headerStyles.container}>
+      <Text variant="heading3">{title}</Text>
+      <Text variant="caption">{time}</Text>
+    </View>
+  )
+}
+
+const headerStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+    minWidth: '100%'
+  },
+  content: {
+    flex: 1,
+    marginLeft: spacing.sm,
+    marginRight: spacing.md,
+  },
+})
+
 export default function Chats() {
   const { id, title, preview, time } = useLocalSearchParams<ChatParams>()
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    if (title && preview && time) {
+      navigation.setOptions({
+        headerTitle: () => <HeaderRenderer title={title} preview={preview} time={time} />,
+      })
+    }
+  }, [title, preview, time, navigation])
 
   if (!id) {
     return (
@@ -17,12 +64,8 @@ export default function Chats() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text variant="heading3">{title}</Text>
-        <Text variant="caption">{time}</Text>
-      </View>
-      <Text variant="bodySmall">{preview}</Text>
+    <View style={styles.root}>
+      
     </View>
   )
 }
@@ -34,15 +77,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.background,
   },
-  container: {
+  root: {
     flex: 1,
-    padding: spacing.lg,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
+  messagesContainer: {
+    padding: spacing.md,
+    gap: spacing.md,
+    paddingBottom: spacing.xl,
+  },
+  inputWrapper: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.background,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e5e5',
   },
 })

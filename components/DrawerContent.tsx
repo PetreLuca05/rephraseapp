@@ -55,9 +55,6 @@ export function DrawerContent(props: DrawerContentComponentProps) {
               router.push({ pathname: '/(drawer)/(tabs)/chats', params: { id: chat.id, title: chat.title, preview: chat.preview, time: chat.time } })
             }}
           >
-            <View style={styles.chatIcon}>
-              <Ionicons name="chatbubble-outline" size={16} color={colors.primary} />
-            </View>
             <View style={styles.chatInfo}>
               <Text variant="label">{chat.title}</Text>
               <Text variant="caption" numberOfLines={1}>{chat.preview}</Text>
@@ -90,6 +87,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: spacing.md,
   },
 
   // Brand
@@ -97,6 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -109,11 +108,14 @@ const styles = StyleSheet.create({
   // Chat list
   chatList: {
     flex: 1,
+    marginHorizontal: -spacing.md,
   },
   chatItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
   chatItemPressed: {
     backgroundColor: colors.surface,
@@ -137,6 +139,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+    paddingVertical: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
