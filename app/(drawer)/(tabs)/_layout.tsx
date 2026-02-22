@@ -1,0 +1,17 @@
+import { DrawerToggleButton } from '@react-navigation/drawer'
+import { Tabs } from 'expo-router'
+
+export default function TabLayout() {
+  return (
+    <Tabs>
+      <Tabs.Screen
+        name="chats"
+        options={{
+          title: 'Chats',
+          headerLeft: () => <DrawerToggleButton />,
+        }}
+      />
+      <Tabs.Screen name="debug" options={{ title: 'Debug' }} />
+    </Tabs>
+  )
+}
